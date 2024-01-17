@@ -79,11 +79,15 @@ public class CategoryController {
 
     /**
      * 删除
+     * @RequestBody：获取请求体，只有post请求才有请求体，get请求无请求体，所以这里只能是post请求
      */
     @RequestMapping("/delete")
     //@RequiresPermissions("product:category:delete")
     public R delete(@RequestBody Long[] catIds){
-		categoryService.removeByIds(Arrays.asList(catIds));
+        // 1. 检查当前菜单是否被引用
+		// categoryService.removeByIds(Arrays.asList(catIds));
+
+        categoryService.removeMenuByIds(Arrays.asList(catIds));
 
         return R.ok();
     }
