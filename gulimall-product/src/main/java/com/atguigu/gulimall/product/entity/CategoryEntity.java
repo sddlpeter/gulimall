@@ -1,15 +1,18 @@
 package com.atguigu.gulimall.product.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
  * 商品三级分类
- * 
+ *
  * @author peter
  * @email sddlpeter@gmail.com
  * @date 2024-01-05 15:11:55
@@ -57,4 +60,112 @@ public class CategoryEntity implements Serializable {
 	 */
 	private Integer productCount;
 
+    @TableField(exist = false)
+    private List<CategoryEntity> children;
+
+
+
+//
+//
+//    public Long getCatId() {
+//        return catId;
+//    }
+//
+//    public void setCatId(Long catId) {
+//        this.catId = catId;
+//    }
+//
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    public Long getParentCid() {
+//        return parentCid;
+//    }
+//
+//    public void setParentCid(Long parentCid) {
+//        this.parentCid = parentCid;
+//    }
+//
+//    public Integer getCatLevel() {
+//        return catLevel;
+//    }
+//
+//    public void setCatLevel(Integer catLevel) {
+//        this.catLevel = catLevel;
+//    }
+//
+//    public Integer getShowStatus() {
+//        return showStatus;
+//    }
+//
+//    public void setShowStatus(Integer showStatus) {
+//        this.showStatus = showStatus;
+//    }
+//
+//    public Integer getSort() {
+//        return sort;
+//    }
+//
+//    public void setSort(Integer sort) {
+//        this.sort = sort;
+//    }
+//
+//    public String getIcon() {
+//        return icon;
+//    }
+//
+//    public void setIcon(String icon) {
+//        this.icon = icon;
+//    }
+//
+//    public String getProductUnit() {
+//        return productUnit;
+//    }
+//
+//    public void setProductUnit(String productUnit) {
+//        this.productUnit = productUnit;
+//    }
+//
+//    public Integer getProductCount() {
+//        return productCount;
+//    }
+//
+//    public void setProductCount(Integer productCount) {
+//        this.productCount = productCount;
+//    }
+//
+//    public CategoryEntity(Long catId, String name, Long parentCid, Integer catLevel, Integer showStatus, Integer sort, String icon, String productUnit, Integer productCount) {
+//        this.catId = catId;
+//        this.name = name;
+//        this.parentCid = parentCid;
+//        this.catLevel = catLevel;
+//        this.showStatus = showStatus;
+//        this.sort = sort;
+//        this.icon = icon;
+//        this.productUnit = productUnit;
+//        this.productCount = productCount;
+//    }
+//
+//    public CategoryEntity() {
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return "CategoryEntity{" +
+//                "catId=" + catId +
+//                ", name='" + name + '\'' +
+//                ", parentCid=" + parentCid +
+//                ", catLevel=" + catLevel +
+//                ", showStatus=" + showStatus +
+//                ", sort=" + sort +
+//                ", icon='" + icon + '\'' +
+//                ", productUnit='" + productUnit + '\'' +
+//                ", productCount=" + productCount +
+//                '}';
+//    }
 }
