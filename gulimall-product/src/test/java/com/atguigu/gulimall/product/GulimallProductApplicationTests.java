@@ -1,5 +1,14 @@
 package com.atguigu.gulimall.product;
 
+//import com.aliyun.oss.OSS;
+//import com.aliyun.oss.OSSClient;
+//import com.aliyun.oss.OSSClientBuilder;
+//import com.aliyun.oss.OSSException;
+//import com.aliyun.oss.common.auth.CredentialsProviderFactory;
+//import com.aliyun.oss.common.auth.EnvironmentVariableCredentialsProvider;
+//import com.aliyun.oss.model.PutObjectRequest;
+//import com.aliyun.oss.model.PutObjectResult;
+//import com.aliyuncs.exceptions.ClientException;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.service.BrandService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -9,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 @SpringBootTest
@@ -17,6 +29,8 @@ class GulimallProductApplicationTests {
 
     @Autowired
     BrandService brandService;
+
+
 
     @Test
     void contextLoads() {
