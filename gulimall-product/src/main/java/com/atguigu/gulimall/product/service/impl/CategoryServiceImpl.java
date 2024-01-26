@@ -3,6 +3,8 @@ package com.atguigu.gulimall.product.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,6 +59,25 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
         // 逻辑删除
         baseMapper.deleteBatchIds(list);
+    }
+
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        List<Long> paths = new ArrayList<>();
+        List<Long> parentPath = findParentPath(catelogId, paths);
+        Collections.reverse(parentPath);
+
+        return parentPath.toArray(new Long[parentPath.size()]);
+    }
+
+    private List<Long> findParentPath(Long catelogId, List<Long> paths) {
+        paths.add(catelogId);
+        CategoryEntity byId = this.getById(catelogId);
+        if (byId.getParentCid() != 0) {
+            findParentPath(byId.getParentCid(), paths);
+        }
+
+        return paths;
     }
 
     // 递归查找所有一级分类菜单的子菜单
