@@ -5,10 +5,7 @@ import com.atguigu.gulimall.product.vo.Catalog2Vo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
+    // Map<String, Object> cache = new HashMap<>();
 
     @Autowired
     CategoryBrandRelationService categoryBrandRelationService;
@@ -42,6 +40,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public List<CategoryEntity> listWithTree() {
+
         //1. 查出所有分类
         List<CategoryEntity> entities = baseMapper.selectList(null);
 
@@ -93,12 +92,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public Map<String, List<Catalog2Vo>> getCatalogJson() {
+
+//        Map<String, List<Catalog2Vo>> catalogJson = (Map<String, List<Catalog2Vo>>) cache.get("catalogJson");
+//        if (cache.get("catalogJson") == null) {
+//            // 调用业务
+//            cache.put("catalogJson", parentCid);
+//        }
+//        return catalogJson;
+
+
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
         // 查所有1分类
-        List<CategoryEntity> level1Categories = getLevel1Categories();
+        List<CategoryEntity> level1Categories = getParentCid(selectList, 0L);
 
         Map<String, List<Catalog2Vo>> parentCid = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
             // 1. 每一个的一级分类，查到这个一级分类的二级分类
-            List<CategoryEntity> entities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", v.getCatId()));
+            List<CategoryEntity> entities = getParentCid(selectList, v.getCatId());
 
             // 2. 封装上面的结果
             List<Catalog2Vo> catalog2Vos = null;
@@ -106,7 +115,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 catalog2Vos = entities.stream().map(l2 -> {
                     Catalog2Vo catalog2Vo = new Catalog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName());
                     // 1. 找当前二级分类的三级分类 封装成vo
-                    List<CategoryEntity> level3Catalog = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", l2.getCatId()));
+                    List<CategoryEntity> level3Catalog = getParentCid(selectList, l2.getCatId());
 
                     if (level3Catalog != null) {
                         List<Catalog2Vo.Catalog3Vo> collect = level3Catalog.stream().map(l3 -> {
@@ -121,8 +130,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             }
             return catalog2Vos;
         }));
-
         return parentCid;
+    }
+
+    private List<CategoryEntity> getParentCid(List<CategoryEntity> selectList, Long parentCid) {
+        // return baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", v.getCatId()));
+        List<CategoryEntity> collect = selectList.stream().filter(item -> item.getParentCid() == parentCid).collect(Collectors.toList());
+        return collect;
     }
 
     private List<Long> findParentPath(Long catelogId, List<Long> paths) {
