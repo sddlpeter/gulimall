@@ -7,6 +7,10 @@ import com.atguigu.gulimall.product.vo.Catalog2Vo;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -91,6 +95,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
 
     // 级联更细腻所有关联的数据
+
+//    @Caching(evict = {
+//            @CacheEvict(value = "category", key="'getLevel1Categories'"),
+//            @CacheEvict(value = "category", key="'getCatalogJson'")
+//    })
+    @CacheEvict(value = "category", allEntries = true) // 失效模式
+    // @CachePut // 双写模式，当前接口或方法没有返回值，双写模式需要将方法返回值放入缓存
     @Transactional
     @Override
     public void updateCascade(CategoryEntity category) {
@@ -98,19 +109,61 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
     }
 
+    // 每一个需要缓存的数据，需要指定放到哪个名字的缓存
+    @Cacheable(value = {"category"}, key = "#root.method.name")  // 代表当前方法的结果需要缓存，如果缓存中有，方法不调用;若缓存没有，则调用方法，将方法结果放入缓存
     @Override
     public List<CategoryEntity> getLevel1Categories() {
+        System.out.println("getLevel1Categories...");
         List<CategoryEntity> entities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
         return entities;
     }
 
 
+    @Cacheable(value = "category", key= "#root.methodName")
+    @Override
+    public Map<String, List<Catalog2Vo>> getCatalogJson() {
+
+        System.out.println("查询了数据库.....");
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
+        List<CategoryEntity> level1Categories = getParentCid(selectList, 0L);
+
+        Map<String, List<Catalog2Vo>> parentCid = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+            // 1. 每一个的一级分类，查到这个一级分类的二级分类
+            List<CategoryEntity> entities = getParentCid(selectList, v.getCatId());
+
+            // 2. 封装上面的结果
+            List<Catalog2Vo> catalog2Vos = null;
+            if (entities != null) {
+                catalog2Vos = entities.stream().map(l2 -> {
+                    Catalog2Vo catalog2Vo = new Catalog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName());
+                    // 1. 找当前二级分类的三级分类 封装成vo
+                    List<CategoryEntity> level3Catalog = getParentCid(selectList, l2.getCatId());
+
+                    if (level3Catalog != null) {
+                        List<Catalog2Vo.Catalog3Vo> collect = level3Catalog.stream().map(l3 -> {
+                            //2. 封装成指定格式
+                            Catalog2Vo.Catalog3Vo catalog3Vo = new Catalog2Vo.Catalog3Vo(l2.getCatId().toString(), l3.getCatId().toString(), l3.getName());
+                            return catalog3Vo;
+                        }).collect(Collectors.toList());
+                        catalog2Vo.setCatalog3List(collect);
+                    }
+                    return catalog2Vo;
+                }).collect(Collectors.toList());
+            }
+            return catalog2Vos;
+        }));
+
+        //3. 查到的数据，将对象转为json放入缓存
+
+        return parentCid;
+    }
+
     // TODO 产生堆外内存溢出： OutOfDirectMemoryError
     //1. springboot2.0 以后默认使用lettuce作为操作redis的客户端,使用netty进行网络通信
     //2. lettuce的bug导致netty堆外内存溢出
     // 解决方案：1.升级lettuce客户端    2.切换使用jedis
-    @Override
-    public Map<String, List<Catalog2Vo>> getCatalogJson() {
+    // @Override
+    public Map<String, List<Catalog2Vo>> getCatalogJson2() {
         //  给缓存中放json字符串，拿出的json字符串，还可以逆转成能用的对象类型，这就是序列化和反序列化
 
         // 1. 空结果缓存，为了解决缓存的穿透问题 2.设置过期事件，解决缓存雪崩问题  3.加锁，解决缓存击穿问题
