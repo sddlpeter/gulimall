@@ -9,6 +9,12 @@ spring:
       oss:
         endpoint: oss-us-west-1.aliyuncs.com
         bucket: gulimall-seattle
+      sms:
+        host: https://gyytz.market.alicloudapi.com
+        path: /sms/smsSend
+        templateId: 908e94ccf08b4476ba6c876d13f084ad
+        signId: 2e65b1bb3d054466b82f0c9d125465e2
+        appcode: 1f79478feba44d768a8df63861ff541e
   application:
     name: gulimall-third-party
 
