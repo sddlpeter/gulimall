@@ -57,7 +57,10 @@
 						<div></div>
 						请输入账户名和密码
 					</div>
-                    <form action="">
+                    <form action="/login" method="post">
+                        <div style="color: red" th:text="${errors!=null?(#maps.containsKey(errors, 'msg')?errors.msg:''):''}">
+
+                        </div>
                         <ul>
                             <li class="top_1">
                                 <img src="/static/login/JD_img/user_03.png" class="err_img1" />
@@ -70,7 +73,7 @@
                             <li class="bri">
                                 <a href="/static/login/">忘记密码</a>
                             </li>
-                            <li class="ent"><button class="btn2"><a class="a">登 &nbsp; &nbsp;录</a></button></li>
+                            <li class="ent"><button class="btn2" type="submit"><a>登 &nbsp; &nbsp;录</a></button></li>
                         </ul>
                     </form>
 
@@ -78,9 +81,8 @@
 				<div class="si_out">
 					<ul>
 						<li>
-							<a href="/static/login/#">
-								<img src="/static/login/JD_img/qq.png" />
-								<span>QQ</span>
+							<a href="https://api.weibo.com/oauth2/authorize?client_id=391746345&response_type=code&redirect_uri=http://auth.gulimall.com/oauth2.0/weibo/success">
+								<img style="width: 50px; height: 18px" src="/static/login/JD_img/weibo.png" />
 							</a>
 						</li>
 						<li class="f4"> | </li>

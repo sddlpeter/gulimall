@@ -103,7 +103,7 @@ public class LoginController {
                 }else {
                     //失败
                     Map<String, String> errors = new HashMap<>();
-                    errors.put("msg", r.getData(new TypeReference<String>(){}));
+                    errors.put("msg", r.getData("msg", new TypeReference<String>(){}));
                     attributes.addFlashAttribute("errors", errors);
                     return "redirect:http://auth.gulimall.com/reg.html";
                 }
@@ -124,7 +124,19 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(UserLoginVo vo) {
-        return "";
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes) {
+        // 远程登录
+        R login = memberFeignService.login(vo);
+        if (login.getCode() == 0) {
+            // 成功
+            return "redirect:http://gulimall.com";
+        } else {
+            // 登录失败
+            Map<String, String> errors = new HashMap<>();
+            errors.put("msg", login.getData("msg", new TypeReference<String>(){}));
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:http://auth.gulimall.com/login.html";
+        }
+
     }
 }

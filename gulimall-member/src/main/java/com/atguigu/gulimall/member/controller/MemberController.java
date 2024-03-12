@@ -8,7 +8,9 @@ import com.atguigu.common.exception.BizCodeEnum;
 import com.atguigu.gulimall.member.exception.PhoneExistsException;
 import com.atguigu.gulimall.member.exception.UserNameExistsException;
 import com.atguigu.gulimall.member.feign.CouponFeignService;
+import com.atguigu.gulimall.member.vo.MemberLoginVo;
 import com.atguigu.gulimall.member.vo.MemberRegistVo;
+import com.atguigu.gulimall.member.vo.SocialUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,20 @@ public class MemberController {
     @Autowired
     CouponFeignService couponFeignService;
 
+
+    @PostMapping("/oauth/login")
+    public R oauthLogin(@RequestBody SocialUser socialUser) throws Exception {
+        MemberEntity entity = memberService.login(socialUser);
+        if (entity != null) {
+            return R.ok().setData(entity);
+        }else  {
+            return R.error(BizCodeEnum.LOGINACCT_PASSWORD_INVALID_EXCEPTION.getCode(), BizCodeEnum.LOGINACCT_PASSWORD_INVALID_EXCEPTION.getMsg());
+        }
+    }
+
+
+
+
     @RequestMapping("/coupons")
     public R test() {
         MemberEntity memberEntity = new MemberEntity();
@@ -44,6 +60,17 @@ public class MemberController {
         // membercoupons.get("coupons");
 
         return R.ok().put("member", memberEntity).put("coupons", membercoupons.get("coupons"));
+    }
+
+    // RequestBody 会把传过来的json数据转换成MemberLoginVo
+    @PostMapping("/login")
+    public R login(@RequestBody MemberLoginVo vo) {
+        MemberEntity entity = memberService.login(vo);
+        if (entity != null) {
+            return R.ok();
+        }else  {
+            return R.error(BizCodeEnum.LOGINACCT_PASSWORD_INVALID_EXCEPTION.getCode(), BizCodeEnum.LOGINACCT_PASSWORD_INVALID_EXCEPTION.getMsg());
+        }
     }
 
     @PostMapping("/regist")
