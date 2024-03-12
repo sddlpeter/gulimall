@@ -66,6 +66,15 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

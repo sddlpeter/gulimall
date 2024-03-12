@@ -57,6 +57,13 @@ public class OAuth2Controller {
                 });
                 log.info("登录成功: 用户: {}" + data.toString());
 
+                // 第一次使用session，浏览器保存卡号 JSESSIONID的cookie
+                // 以后浏览器访问哪个网站就会带上cookie
+                // 子域之间 gulimall.com, auth.gulimall.com, order.gulimall.com
+                // 发卡的时候，即使是子域系统发的卡，也能让父域直接使用
+
+                // TODO 1. 默认发的令牌 session=dfjslk 作用域：当前域 解决子域共享问题
+                // TODO 2. 使用json的序列化方式，来序列化对象数据到 redis
                 session.setAttribute("loginUser", data);
                 return "redirect:http://gulimall.com";
             } else {
