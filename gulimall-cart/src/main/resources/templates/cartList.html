@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<-- xmlns="http:/www.w3.org/1999/xhtml"-->
 <head>
     <meta charset="UTF-8">
     <title>购物车</title>
@@ -94,14 +93,16 @@
                     </div>
                     <div>
                         <ol>
-                            <li><input type="checkbox" th:attr="skuid=${item.skuId}" class="itemCheck" th:checked="${item.check}"></li>
+                            <li><input type="checkbox" th:attr="skuid=${item.skuId}" class="itemCheck"
+                                       th:checked="${item.check}"></li>
                             <li>
                                 <dt><img th:src="${item.image}" alt=""></dt>
                                 <dd style="width: 300px">
                                     <p>
-                                        <span th:text="${item.title}" >TCL 55A950C 55英寸32核</span>
+                                        <span th:text="${item.title}">TCL 55A950C 55英寸32核</span>
                                         <br/>
-                                        <span th:each="attr:${item.skuAttr}" th:text="${attr}" >尺码: 55时 超薄曲面 人工智能</span>
+                                        <span th:each="attr:${item.skuAttr}"
+                                              th:text="${attr}">尺码: 55时 超薄曲面 人工智能</span>
                                     </p>
 
                                 </dd>
@@ -112,15 +113,16 @@
                             </li>
                             <li>
                                 <p th:attr="skuId=${item.skuId}">
-                                    <span class="countOpsBtn" >-</span>
+                                    <span class="countOpsBtn">-</span>
                                     <span class="countOpsNum" th:text="${item.count}">5</span>
-                                    <span class="countOpsBtn" >+</span>
+                                    <span class="countOpsBtn">+</span>
                                 </p>
 
                             </li>
-                            <li style="font-weight:bold"><p class="zj">￥[[${#numbers.formatDecimal(item.totalPrice,3,2)}]]</p></li>
+                            <li style="font-weight:bold"><p class="zj">
+                                ￥[[${#numbers.formatDecimal(item.totalPrice,3,2)}]]</p></li>
                             <li>
-                                <p class="deleteItemBtn" th:attr="skuId=${item.skuId}" >删除</p>
+                                <p class="deleteItemBtn" th:attr="skuId=${item.skuId}">删除</p>
 
                             </li>
                         </ol>
@@ -148,7 +150,8 @@
             </div>
             <div>
                 <ol>
-                    <li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt">￥[[${#numbers.formatDecimal(cart.totalAmount,3,2)}]]</span></li>
+                    <li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt">￥[[${#numbers.formatDecimal(cart.totalAmount,3,2)}]]</span>
+                    </li>
                     <li>优惠：￥[[${#numbers.formatDecimal(cart.reduce,1,2)}]]</li>
 
                 </ol>
@@ -222,16 +225,18 @@
 </body>
 <script src="/static/cart/js/index.js" charset="utf-8"></script>
 <script type="text/javascript">
+
+
     function toTrade() {
-        window.location.href = "http:/cart.gmall.com:8087/toTrade";
+        window.location.href = "http://order.gulimall.com/toTrade";
     }
 
     function toItem(skuId) {
-        window.location.href = "http:/item.gmall.com:8084/" + skuId + ".html";
+        window.location.href = "http://item.gmall.com:8084/" + skuId + ".html";
     }
 
     function login() {
-        // var s = encodeURIComponent("http:/cart.gmall.com:8087/cartList");
+        var s = encodeURIComponent("http://cart.gmall.com:8087/cartList");
         window.location.href = "http://auth.gulimall.com/login.html";
     }
 
@@ -249,20 +254,19 @@
 
     }
 
-    /封装总价钱函数
-
+    //封装总价钱函数
     function sumSumPrice() {
-        /         var zzj=0;
-        /         $(".check").each(function () {
-        /             if($(this).prop("checked")){
-        /                 var zj = $(this).parents("ol").find(".zj").html().substring(1);
-        /                 zzj=zzj+parseFloat(zj);
-        /             }
-        /             $(".fnt").html("￥"+zzj+".00")
-        /         });
+        //         var zzj=0;
+        //         $(".check").each(function () {
+        //             if($(this).prop("checked")){
+        //                 var zj = $(this).parents("ol").find(".zj").html().substring(1);
+        //                 zzj=zzj+parseFloat(zj);
+        //             }
+        //             $(".fnt").html("￥"+zzj+".00")
+        //         });
     }
 
-    /*    /购物车结算固定定位
+    /*    //购物车结算固定定位
         $(document).scroll(function(){
             if($(window).scrollTop()>50){
                 $(".fix").hide();
@@ -272,7 +276,7 @@
         })*/
 
 
-    /购物车顶端tab
+    //购物车顶端tab
     $(".One_Topleft span:last-child").mouseover(function () {
         $(".One_Topleft span:first-child").css({
             "color": "black",
@@ -294,12 +298,12 @@
             "border-bottom": "2px solid red"
         })
     })
-    / 立即登录
+    //立即登录
     $(".one_search_load input:button").click(function () {
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
-    / 去结算
+    //去结算
     $(".One_ShopFootBuy>div:last-child button").mouseover(function () {
         $(this).css("cursor", "pointer");
     })
@@ -307,7 +311,7 @@
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
-    / buyNum
+    //buyNum
     $(".One_ShopFootBuy>div:nth-child(2)").mouseover(function () {
         $(this).css("cursor", "pointer")
     })
@@ -321,7 +325,7 @@
             $(".One_ShopFootBuy>div:nth-child(2) img").css("transform", "rotateX(180deg)")
         }
     })
-    / 右侧固定定位
+    //右侧固定定位
     $(".One_RightFix ul>li:not(:first-child)").mouseover(function () {
         $(this).css({
             "cursor": "pointer",
@@ -336,7 +340,7 @@
             "left": "75px"
         }, 200)
     })
-    / 右侧底部固定定位
+    //右侧底部固定定位
     $(".One_RightbtmFix ul>li").mouseover(function () {
         $(this).css({
             "cursor": "pointer",
@@ -351,7 +355,7 @@
             "left": "55px"
         }, 200)
     })
-    / 登录弹框tab切换
+    //登录弹框tab切换
     $(".One_DengLu>div:nth-child(3) ul li").mouseover(function () {
         $(this).css("cursor", "pointer")
     })
@@ -367,12 +371,12 @@
         })
         $(".One_DengLu>div:nth-child(3) ol li").eq(i).show().siblings().hide()
     })
-    / 优惠券
+    //优惠券
     $(".One_ShopBottom>div:nth-child(2) img").click(function () {
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
-    / 配送地址hover效果
+    //配送地址hover效果
     $(".One_Topright span:last-child").mouseover(function () {
         $(this).children(".One_Local").css("display", "block")
     }).mouseout(function () {
@@ -402,27 +406,21 @@
     $(".One_Local>ul>li>ol li").click(function () {
         $(this).parent().parent().children("label").html($(this).html())
     })
-    / 购物车全选反选
+    //购物车全选反选
     $(".One_ShopTop ul li:first-child .allCheck").click(function () {
         if ($(".One_ShopTop ul li:first-child .allCheck").is(":checked")) {
-            / $(".check").each(function(index){
+            // $(".check").each(function(index){
             $(".check").prop("checked", true);
             $(".check").parent().parent().parent().css("background", "#fff4e8");
             $(".One_ShopBottom>div:first-child span:first-child .allCheck").prop("checked", true)
-            /
+            // })
+        } else {
+            // $(".check").each(function(){
+            $(".check").parent().parent().parent().css("background", "none");
+            $(".check").prop("checked", false);
+            $(".One_ShopBottom>div:first-child span:first-child .allCheck").prop("checked", false)
+            // })
         }
-    )
-    }
-    else
-    {
-        / $(".check").each(function(){
-        $(".check").parent().parent().parent().css("background", "none");
-        $(".check").prop("checked", false);
-        $(".One_ShopBottom>div:first-child span:first-child .allCheck").prop("checked", false)
-        /
-    }
-    )
-    }
     })
     $(".One_ShopFootBuy>div:first-child ul li:first-child .allCheck").click(function () {
         if ($(".One_ShopFootBuy>div:first-child ul li:first-child .allCheck").is(":checked")) {
@@ -444,7 +442,7 @@
             $(".check").prop("checked", false);
         }
     })
-    / 如果子选择框没有选中则父选框取消全选
+    //如果子选择框没有选中则父选框取消全选
     $(".check").click(function () {
         $(".check").each(function () {
             if ($(this).prop("checked") == true) {
@@ -452,7 +450,7 @@
             }
         })
     })
-    / 子选择框全部选中复选框也选中
+    //子选择框全部选中复选框也选中
     $(".check").click(function () {
         if ($(".check[class='check']:checked").length == $(".check[class='check']").length) {
             $(".allCheck").prop("checked", true);
@@ -460,30 +458,28 @@
             $(".allCheck").prop("checked", false)
         }
     })
-    / 删除已选的商品
+    //删除已选的商品
     $(".One_ShopFootBuy>div:first-child ul li:nth-child(2)").click(function () {
-        / $(".check").each(function(){
+        // $(".check").each(function(){
         if ($(".check").is(":checked") == false) {
             $(".One_mb").show();
             $(".One_moveGzIfNull").show();
         } else {
-            $(".One_mb").show();
-            /蒙版显示
-            $(".One_isDel").show();
-            /删除弹框显示
+            $(".One_mb").show(); //蒙版显示
+            $(".One_isDel").show(); //删除弹框显示
             $(".One_moveGzIfNull").hide();
         }
-        /移除结账固定定位
-        / if($(".check").length==1){
-        / 	$(".fix").remove();
-        / }
-        / })
-        /var that=$(this);
-        /确定删除
+        //移除结账固定定位
+        // if($(".check").length==1){
+        // 	$(".fix").remove();
+        // }
+        // })
+        //var that=$(this);
+        //确定删除
         /*      $(".One_isDel>div:last-child button:first-child").click(function(){
-                  $(".One_mb").hide();    /蒙版隐藏
-                  $(".One_isDel").hide(); /删除弹框隐藏
-                  $(".check:checked").parent().parent().parent().parent().remove();  /删除选中商品
+                  $(".One_mb").hide();    //蒙版隐藏
+                  $(".One_isDel").hide(); //删除弹框隐藏
+                  $(".check:checked").parent().parent().parent().parent().remove();  //删除选中商品
                   if($(".fix").offset().top>$(".fix1").offset().top){
                       $(".fix").hide();
                   }
@@ -494,13 +490,13 @@
                   }
               })*/
     })
-    / 确定删除弹框移入我的关注
+    //确定删除弹框移入我的关注
     $(".One_isDel>div:last-child button:last-child").click(function () {
         $(".One_isDel").hide();
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
-    / 移到我的关注
+    //移到我的关注
     $(".One_ShopFootBuy>div:first-child ul li:nth-child(3)").click(function () {
         $(".check").each(function (index) {
             if ($(this).is(":checked") == false) {
@@ -513,7 +509,7 @@
             }
         })
     })
-    / 点击×号关闭
+    //点击×号关闭
     $(".One_moveGzIfNull>p span:last-child img").click(function () {
         $(".One_mb").hide();
         $(".One_moveGzIfNull").hide();
@@ -527,12 +523,12 @@
         $(".One_mb").hide();
         $(".One_clearShop").hide();
     })
-    / 移到我的关注取消按钮点击关闭
+    //移到我的关注取消按钮点击关闭
     $(".One_moveMyGz>div:last-child button:last-child").click(function () {
         $(".One_mb").hide();
         $(".One_moveMyGz").hide();
     })
-    / 移到我的关注确定按钮点击登录弹框弹出
+    //移到我的关注确定按钮点击登录弹框弹出
     $(".One_moveMyGz>div:last-child button:first-child").click(function () {
         $(".One_moveMyGz").hide();
         $(".One_mb").show();
@@ -543,44 +539,44 @@
         $(".One_mb").hide();
         $(".One_DengLu").hide();
     })
-    / 清除下柜商品
+    //清除下柜商品
     $(".One_ShopFootBuy>div:first-child ul li:nth-child(4)").click(function () {
         $(".One_mb").show();
         $(".One_clearShop").show()
     })
-    / 购物车 + -
-        /鼠标移入变小手
+    //购物车+ -
+    //鼠标移入变小手
     $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span").mouseover(function () {
         $(this).css("cursor", "pointer")
     })
-    / +
-        $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span:last-child").click(function () {
-            var add = $(this).prev("span").html();
-            add++;
-            $(this).prev("span").html(add);
-            /总价
-            var dj = $(this).parent().parent().prev().children(".dj").html().substring(1);
-            var sl = $(this).prev("span").html();
-            $(this).parent().parent().parent().children("li:nth-child(5)").children(".zj").html("￥" + dj * sl + ".00")
-            sumSumPrice();
+    //+
+    $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span:last-child").click(function () {
+        var add = $(this).prev("span").html();
+        add++;
+        $(this).prev("span").html(add);
+        //总价
+        var dj = $(this).parent().parent().prev().children(".dj").html().substring(1);
+        var sl = $(this).prev("span").html();
+        $(this).parent().parent().parent().children("li:nth-child(5)").children(".zj").html("￥" + dj * sl + ".00")
+        sumSumPrice();
 
-        })
-    / -
-        $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span:first-child").click(function () {
-            var jian = $(this).next("span").html();
-            jian--;
-            if (jian <= 0) {
-                jian = 0;
-            }
-            $(this).next("span").html(jian);
-            /总价
-            var dj = $(this).parent().parent().prev().children(".dj").html().substring(1);
-            var sl = $(this).next("span").html();
-            $(this).parent().parent().parent().children("li:nth-child(5)").children(".zj").html("￥" + dj * sl + ".00")
-            sumSumPrice();
+    })
+    //-
+    $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span:first-child").click(function () {
+        var jian = $(this).next("span").html();
+        jian--;
+        if (jian <= 0) {
+            jian = 0;
+        }
+        $(this).next("span").html(jian);
+        //总价
+        var dj = $(this).parent().parent().prev().children(".dj").html().substring(1);
+        var sl = $(this).next("span").html();
+        $(this).parent().parent().parent().children("li:nth-child(5)").children(".zj").html("￥" + dj * sl + ".00")
+        sumSumPrice();
 
-        })
-    / 选中当前商品背景变色
+    })
+    //选中当前商品背景变色
     $(".check").each(function (index) {
         $(".check").eq(index).click(function () {
             if ($(this).is(":checked")) {
@@ -592,7 +588,7 @@
             }
         })
     })
-    / 商品删除鼠标移入变色
+    //商品删除鼠标移入变色
     $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(6) p").mouseover(function () {
         $(this).css({
             "cursor": "pointer",
@@ -612,8 +608,8 @@
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
-    / 点击删除
-    / 点击删除出现弹框
+    //点击删除
+    //点击删除出现弹框
     $(".One_isDel>p img").click(function () {
         $(".One_mb").hide();
         $(".One_isDel").hide();
@@ -622,15 +618,15 @@
         $(".One_mb").show();
         $(".One_isDel").show();
         var that = $(this);
-        /确定删除
+        //确定删除
         /*        $(".One_isDel>div:last-child button:first-child").click(function(){
                     $(".One_mb").hide();
                     $(".One_isDel").hide();
                     that.parent().parent().parent().parent().remove();
-                    / 移除结账固定定位
-                    / if($(".check").length==1){
-                    / 	$(".fix").remove();
-                    / }
+                    // 移除结账固定定位
+                    // if($(".check").length==1){
+                    // 	$(".fix").remove();
+                    // }
                     if($(".fix").offset().top>$(".fix1").offset().top){
                         $(".fix").hide();
                     }
@@ -641,7 +637,7 @@
                     }
                 })*/
     })
-    /*    /页面滚动删除去结算固定定位隐藏
+    /*    //页面滚动删除去结算固定定位隐藏
         $(document).scroll(function(){
             if($(".fix").offset().top>$(".fix1").offset().top){
                 $(".fix").hide();
@@ -660,8 +656,7 @@
         $(this).css("color", "black")
     })
 
-    / 封装总价钱函数
-
+    //封装总价钱函数
     function sumSumPrice() {
         console.log("计算总价");
         var zzj = 0;
@@ -683,8 +678,7 @@
                 $(".fnt").html("￥"+kong+".00")*/
     }
 
-    /封装总数量函数
-
+    //封装总数量函数
     function sumSumNum() {
         var kong = 0;
         $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span:nth-child(2)").each(function () {
@@ -701,16 +695,16 @@
     }).mouseout(function () {
         $(this).css("color", "black")
     })
-    / 更多促销下拉
+    //更多促销下拉
     $(".One_ShopCon ul li>div:nth-child(2) ol li:nth-child(3) p:nth-child(2)").click(function () {
         $(this).parent().children(".nmbd").slideToggle(300);
         var dis = $(this).parent().children(".nmbd").css("display");
         console.log(dis);
-        / if(dis=="block"){
-        / 	$(".hahaha").css("transform","rotateX(-180deg)")
-        / }else{
-        / 	$(".hahaha").css("transform","rotateX(360deg)")
-        / }
+        // if(dis=="block"){
+        // 	$(".hahaha").css("transform","rotateX(-180deg)")
+        // }else{
+        // 	$(".hahaha").css("transform","rotateX(360deg)")
+        // }
     })
     $(".nmbd dd:last-child button:first-child").click(function () {
         $(this).parent().parent().slideUp(100)
@@ -720,21 +714,21 @@
     })
 
 
-    / active
+    //active
     $(".one_main_div1 .one_main_ul>li").mouseover(function () {
         $(".one_main_div1 .one_main_ul>li").removeClass("active");
         $(this).addClass("active");
     })
-    / 选项卡
+    //选项卡
     $(".one_main_div1 .one_main_ul li").mouseover(function () {
         $(".one_main_div1_1").eq($(this).index()).stop(true).show().siblings().stop(true).hide()
     })
 
     $(function () {
-        /声明变量记录索引
+        //声明变量记录索引
         var index = 0;
-        /点击右边按钮
-        /忽略重复点击开关
+        //点击右边按钮
+        //忽略重复点击开关
         var toggle = true
         $(".arrow-right").click(function () {
 
@@ -749,7 +743,7 @@
 
         });
 
-        /点击左边按钮
+        //点击左边按钮
         $(".arrow-left").click(function () {
             if (toggle == false) {
                 return
@@ -764,42 +758,45 @@
                 toggle = true
             }).siblings("li").fadeOut(500);
         });
-        /点击分页器
+        //点击分页器
         $('.pagination ul li').mouseover(function () {
             var paging = $(this).index()
-                / 变颜色
+            //变颜色
             $(this).addClass('active').siblings().removeClass('active')
-            / 与图片关联
+            //与图片关联
             $(".slider>ul>li").eq(paging).fadeIn(1000).siblings("li").fadeOut(1000);
 
         })
     });
     $(".fade li>div a").mouseover(function () {
         $(this).children("p").children("img").attr("src", "img/one_mian_gwc2.png")
-    }).mouseout(function () {
         $(this).children("p").children("img").attr("src", "img/one_mian_gwc1.png")
-    })
+    });
 
-    $(".itemCheck").click(function() {
-        var attr = $(this).attr("skuId");
-        var check = $(this).prop("checked");
-        location.href = "http://cart.gulimall.com/checkItem?skuId=" + skuId + "&check=" + (check ? 1:0);
-    })
+    $(".itemChecked").click(function () {
+        const skuId = $(this).attr("skuId");
+        const checked = $(this).prop("checked");
+        location.href = "http://cart.gulimall.com/checkItem?skuId=" + skuId + "&checked=" + (checked ? 1 : 0);
+    });
 
-    $(".countOpsBtn").click(function() {
-        let skuId = $(this).parent().attr("skuId");
-        var num = $(this).parent().find(".countOpsNum").text();
+
+    $(".countOpsBtn").click(function () {
+        const skuId = $(this).parent().attr("skuId");
+        const num = $(this).parent().find(".countOpsNum").text();
         location.href = "http://cart.gulimall.com/countItem?skuId=" + skuId + "&num=" + num;
-    })
+    });
 
 
-    var deleteId = 0;
+    let deleteId = 0;
+    $(".deleteItemBtn").click(function () {
+        deleteId = $(this).attr("skuId");
+    });
+
+    //删除购物车选项
     function deleteItem() {
-        location.href = "http://cart.gulimall.com/deleteItem?deleteId=" + deleteId;
+        location.href = "http://cart.gulimall.com/deleteItem?skuId=" + deleteId;
     }
 
-    $(".deleteItemBtn").click(function() {
-        deleteId = $(this).attr("skuId");
-    })
+
 </script>
 </html>
