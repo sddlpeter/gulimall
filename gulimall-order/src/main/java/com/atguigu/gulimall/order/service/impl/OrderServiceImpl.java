@@ -5,7 +5,6 @@ import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.utils.R;
 import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.order.constant.OrderConstant;
-import com.atguigu.gulimall.order.dao.OrderItemDao;
 import com.atguigu.gulimall.order.entity.OrderItemEntity;
 import com.atguigu.gulimall.order.enume.OrderStatusEnum;
 import com.atguigu.gulimall.order.feign.CartFeignService;
@@ -17,6 +16,8 @@ import com.atguigu.gulimall.order.service.OrderItemService;
 import com.atguigu.gulimall.order.to.OrderCreateTo;
 import com.atguigu.gulimall.order.vo.*;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import io.seata.spring.annotation.GlobalTransactional;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -39,6 +40,7 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.order.dao.OrderDao;
 import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.atguigu.gulimall.order.service.OrderService;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
@@ -142,6 +144,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return confirmVo;
     }
 
+
+    @Transactional(timeout = 30)
+    public void a() {
+        // b c做任何设置都没用，都和 a 共用一个事务, 相当于拷贝代码到同一个方法
+        // this.b();  // 除非用orderServiceImpl.b()才有用
+        // this.c();
+
+        OrderServiceImpl orderService = (OrderServiceImpl) AopContext.currentProxy();
+        orderService.b();  // TODO 使用代理对象调用，事务的设置才会发挥作用
+        orderService.c();
+        // bService.b();  // a 事务
+        // cService.c();  // 新事务，不回滚
+
+        int i = 10/0; // 模拟异常
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, timeout = 2)
+    public void b() {
+        // 7s
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, timeout = 20)
+    public void c() {
+
+    }
+
+
+
+    @GlobalTransactional
     @Transactional
     @Override
     public SubmitOrderResponseVo submitOrder(OrderSubmitVo vo) {
@@ -177,7 +208,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             if (Math.abs(payAmount.subtract(payPrice).doubleValue()) < 0.01) {
                 // 金额对比
                 // ...
-                // 3.保存订单到数据库
+                // TODO 3.保存订单到数据库
                 saveOrder(order);
                 // 4. 库存锁定, 只要有异常，回滚
                 WareSkuLockVo lockVo = new WareSkuLockVo();
@@ -190,17 +221,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     return itemVo;
                 }).collect(Collectors.toList());
                 lockVo.setLocks(locks);
-                // TODO 远程锁库存
+                // TODO 4.远程锁库存
                 R r = wmsFeignService.orderLockStock(lockVo);
                 if(r.getCode() == 0) {
                     // 锁定成功
                     responseVo.setOrder(order.getOrder());
+
+                    // TODO 5. 远程扣减用户积分 - 模拟异常
+                    int i = 10/0;  // 订单回滚，远程库存不回滚
+
                     return responseVo;
                 } else {
                     //  锁定失败
+                    responseVo.setCode(3);
                     throw new NoStockException();
-//                    responseVo.setCode(3);
-//                    return responseVo;
+                    //return responseVo;
                 }
             } else {
                 responseVo.setCode(2);

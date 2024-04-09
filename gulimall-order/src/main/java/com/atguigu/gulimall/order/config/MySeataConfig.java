@@ -1,30 +1,17 @@
-package com.atguigu.gulimall.ware.config;
+package com.atguigu.gulimall.order.config;
 
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.zaxxer.hikari.HikariDataSource;
 import io.seata.rm.datasource.DataSourceProxy;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 
-@EnableTransactionManagement
-@MapperScan("com.atguigu.gulimall.ware.dao")
 @Configuration
-public class WareMyBatisConfig {
-    @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
-
-        paginationInterceptor.setOverflow(true);
-        paginationInterceptor.setLimit(1000);
-        return paginationInterceptor;
-    }
+public class MySeataConfig {
 
     @Autowired
     DataSourceProperties dataSourceProperties;
@@ -36,4 +23,5 @@ public class WareMyBatisConfig {
         }
         return new DataSourceProxy(dataSource);
     }
+
 }

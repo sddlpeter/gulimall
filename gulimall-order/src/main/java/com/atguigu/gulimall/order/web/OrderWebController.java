@@ -48,7 +48,7 @@ public class OrderWebController {
                 case 2: msg += "订单商品价格发生变化，请确认后再次提交"; break;
                 case 3: msg += "库存锁定失败，商品库存不足"; break;
             }
-            redirectAttributes.addFlashAttribute("msg", "msg");
+            redirectAttributes.addFlashAttribute("msg", msg);
             return "redirect:http://order.gulimall.com/toTrade";
         }
     }
