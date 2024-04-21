@@ -1,6 +1,6 @@
 package com.atguigu.gulimall.order;
 
-import io.seata.tm.api.GlobalTransaction;
+// import io.seata.tm.api.GlobalTransaction;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +14,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableRedisHttpSession
 @EnableRabbit
 @EnableDiscoveryClient
-@SpringBootApplication(exclude = GlobalTransaction.class)
+@SpringBootApplication
 public class GulimallOrderApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GulimallOrderApplication.class, args);

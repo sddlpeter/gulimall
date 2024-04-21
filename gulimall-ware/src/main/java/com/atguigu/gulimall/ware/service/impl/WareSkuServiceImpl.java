@@ -211,7 +211,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     public void unlockStock(StockLockedTo to) {
 
 
-        System.out.println("收到解锁库存的消息");
+        System.out.println("WareSkuServiceImpl 收到解锁库存的消息, 执行unlockStock()...");
         // Long id = to.getId();
         StockDetailTo detail = to.getDetail();
         Long detailId = detail.getId();
