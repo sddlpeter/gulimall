@@ -24,7 +24,8 @@ public class AlipayTemplate {
     private  String alipay_public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzVbOycS7AjruGWzXTgnNXU08mbMu+TSmGDm2w9xdmFEqbA3F1YZ3tL81FHd35F5Z1U6qzWmauWynu0gtrwwfLkzeQxBWbGRZErhURUa4f/Q01t/i2z+p4WVG5ACFMyUxyTuScKIAYO2/DKEiEqaM4yZzTnYlZw+UJpBxpyWc1IV8WKptjnFp1RPXA+WPfo9MvbX9ArCqQsyj+8uysAAkKQnAlcw3P2dWXhB5dAod7HPgQ0Q/qkLTPSloaSAD2FoKtlT2b0lrn820m+YOj1daQU9JR6FAJ/BwW/2x346v2psAOAOiD3bToWXuvHXlbMSjluH7VVxHSzLm8WJ6OQfpBQIDAQAB";
     // 服务器[异步通知]页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
     // 支付宝会悄悄的给我们发送一个请求，告诉我们支付成功的信息
-    private  String notify_url = "https://9b38-76-147-228-41.ngrok-free.app/alipay.trade.page.pay-JAVA-UTF-8/notify_url.jsp";
+    // TODO 需要用内网穿透的地址， https://8455-76-147-228-41.ngrok-free.app -> http://order.gulimall.com:80
+    private  String notify_url = "https://8455-76-147-228-41.ngrok-free.app/paid/notify";
 
     // 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
     //同步通知，支付成功，一般跳转到成功页
@@ -35,6 +36,8 @@ public class AlipayTemplate {
 
     // 字符编码格式
     private  String charset = "utf-8";
+
+    private String timeout = "30m";
 
     // 支付宝网关； https://openapi.alipaydev.com/gateway.do
     private  String gatewayUrl = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
@@ -65,6 +68,7 @@ public class AlipayTemplate {
                 + "\"total_amount\":\""+ total_amount +"\","
                 + "\"subject\":\""+ subject +"\","
                 + "\"body\":\""+ body +"\","
+                + "\"timeout_express\":\""+timeout+"\","
                 + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
 
         String result = alipayClient.pageExecute(alipayRequest).getBody();

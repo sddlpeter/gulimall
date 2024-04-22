@@ -1,8 +1,10 @@
 package com.atguigu.gulimall.order.dao;
 
 import com.atguigu.gulimall.order.entity.OrderEntity;
+import com.atguigu.gulimall.order.enume.OrderStatusEnum;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 订单
@@ -13,5 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface OrderDao extends BaseMapper<OrderEntity> {
-	
+
+    void updateOrderStatus(@Param("outTradeNo") String outTradeNo, @Param("code") OrderStatusEnum code);
 }
