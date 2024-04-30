@@ -10,4 +10,6 @@ public interface SecKillService {
     List<SecKillSkuRedisTo> getCurrentSecKillSkus();
 
     SecKillSkuRedisTo getSkuSecKillInfo(Long skuId);
+
+    String kill(String killId, String key, Integer num);
 }

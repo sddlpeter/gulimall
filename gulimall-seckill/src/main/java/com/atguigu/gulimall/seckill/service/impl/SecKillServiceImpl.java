@@ -3,13 +3,17 @@ package com.atguigu.gulimall.seckill.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.utils.R;
+import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.seckill.feign.CouponFeignService;
 import com.atguigu.gulimall.seckill.feign.ProductFeignService;
+import com.atguigu.gulimall.seckill.interceptor.LoginUserInterceptor;
 import com.atguigu.gulimall.seckill.service.SecKillService;
 import com.atguigu.gulimall.seckill.to.SecKillSkuRedisTo;
 import com.atguigu.gulimall.seckill.vo.SecKillSessionsWithSkus;
 import com.atguigu.gulimall.seckill.vo.SecKillSkuVo;
 import com.atguigu.gulimall.seckill.vo.SkuInfoVo;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +23,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -117,7 +122,67 @@ public class SecKillServiceImpl implements SecKillService {
         return null;
     }
 
+    @Override
+    public String kill(String killId, String key, Integer num) {
+        MemberRespVo respVo = LoginUserInterceptor.loginUser.get();
+
+        // 1. 获取秒杀商品的详细信息
+        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+        String json = hashOps.get(killId);
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        } else {
+            SecKillSkuRedisTo redisTo = JSON.parseObject(json, SecKillSkuRedisTo.class);
+            // 校验合法性
+            Long startTime = redisTo.getStartTime();
+            Long endTime = redisTo.getEndTime();
+            long time = new Date().getTime();
+            long ttl = endTime - startTime;
+            // 1. 校验时间的合法性
+            if (time >= startTime && time <= endTime) {
+                // 2. 校验随机码和商品id
+                String randomCode = redisTo.getRandomCode();
+                String skuId = redisTo.getPromotionSessionId() + "_" + redisTo.getSkuId();
+                if (randomCode.equals(key) && killId.equals(skuId)) {
+                    // 3. 验证购物数量是否合理
+                    if (num <= redisTo.getSeckillLimit().intValue() ) {
+                        // 4. 验证这个人是否已经购买过, 幂等性处理; 只要秒杀成功，就去redis占位
+                        // SETNX
+                        String redisKey = respVo.getId() + "_" + skuId;
+                        // 自动过期
+                        Boolean aBoolean = redisTemplate.opsForValue().setIfAbsent(redisKey, num.toString(), ttl, TimeUnit.MILLISECONDS);
+                        if(aBoolean) {
+                            // 占位成功说明从来没买过
+                            RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE + randomCode);
+                            try {
+                                boolean b = semaphore.tryAcquire(num, 100, TimeUnit.MILLISECONDS);
+
+                                // 秒杀成功， 快速下单, 发送mq消息
+                                String timeId = IdWorker.getTimeId();
+                                return timeId;
+
+                            } catch (InterruptedException e) {
+                                return null;
+                            }
+                        } else {
+                            // 说明已经买过了
+                            return null;
+                        }
+                    }
+
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+        return null;
+
+    }
+
     private void saveSessionInfo(List<SecKillSessionsWithSkus> sessions) {
+        if (sessions == null) return;
         sessions.stream().forEach(session -> {
             long startTime = session.getStartTime().getTime();
             long endTime = session.getEndTime().getTime();
@@ -135,6 +200,7 @@ public class SecKillServiceImpl implements SecKillService {
     }
 
     private void saveSessionSkuInfo(List<SecKillSessionsWithSkus> sessions) {
+        if (sessions == null) return;
         sessions.stream().forEach(session -> {
             // 准备hash操作
             BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
