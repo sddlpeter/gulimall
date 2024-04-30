@@ -18,9 +18,8 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,6 +59,62 @@ public class SecKillServiceImpl implements SecKillService {
             // 2. 缓存活动关联的商品信息
             saveSessionSkuInfo(sessionData);
         }
+    }
+
+    @Override
+    public List<SecKillSkuRedisTo> getCurrentSecKillSkus() {
+        // 1. 确定当前时间属于哪个秒杀场次
+        long time = new Date().getTime();
+        Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
+        for (String key : keys) {
+            String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
+            String[] s = replace.split("_");
+            long start = Long.parseLong(s[0]);
+            long end = Long.parseLong(s[1]);
+            if (time >= start && time <= end) {
+                // 2. 获取这个秒杀场次需要的所有商品信息
+                List<String> range = redisTemplate.opsForList().range(key, -100, 100);
+                BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+                List<String> list = hashOps.multiGet(range);
+                if (list != null) {
+                    List<SecKillSkuRedisTo> collect = list.stream().map(item -> {
+                        SecKillSkuRedisTo redis = JSON.parseObject((String) item, SecKillSkuRedisTo.class);
+                        // redis.setRandomCode(null); 当前秒杀开始了，需要随机码
+                        return redis;
+                    }).collect(Collectors.toList());
+                    return collect;
+                }
+                break;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public SecKillSkuRedisTo getSkuSecKillInfo(Long skuId) {
+        //1. 找到所有需要参与秒杀的商品的key
+        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+        Set<String> keys = hashOps.keys();
+        if(keys != null && keys.size() > 0) {
+            String regx = "\\d_" + skuId;
+            for (String key : keys) {
+                if (Pattern.matches(regx, key)) {
+                    String json = hashOps.get(key);
+                    SecKillSkuRedisTo redisTo = JSON.parseObject(json, SecKillSkuRedisTo.class);
+
+                    // 随机码
+                    Long startTime = redisTo.getStartTime();
+                    Long endTime = redisTo.getEndTime();
+                    Long current = new Date().getTime();
+                    if(current >= startTime && current <= endTime) {
+                    } else {
+                        redisTo.setRandomCode(null);
+                    }
+                    return redisTo;
+                }
+            }
+        }
+        return null;
     }
 
     private void saveSessionInfo(List<SecKillSessionsWithSkus> sessions) {

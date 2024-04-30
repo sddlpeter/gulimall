@@ -1,13 +1,12 @@
-package com.atguigu.gulimall.seckill.to;
+package com.atguigu.gulimall.product.vo;
 
-import com.atguigu.gulimall.seckill.vo.SkuInfoVo;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Data
-public class SecKillSkuRedisTo {
+public class SecKillInfoVo {
+
     private Long id;
     /**
      * 活动id
@@ -47,9 +46,4 @@ public class SecKillSkuRedisTo {
 
     // 结束时间
     private Long endTime;
-
-    // sku的详细信息
-    private SkuInfoVo skuInfoVo;
-
-
 }
