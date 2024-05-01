@@ -2,6 +2,7 @@ package com.atguigu.gulimall.seckill.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.atguigu.common.to.mq.SecKillOrderTo;
 import com.atguigu.common.utils.R;
 import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.seckill.feign.CouponFeignService;
@@ -13,9 +14,11 @@ import com.atguigu.gulimall.seckill.vo.SecKillSessionsWithSkus;
 import com.atguigu.gulimall.seckill.vo.SecKillSkuVo;
 import com.atguigu.gulimall.seckill.vo.SkuInfoVo;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
@@ -27,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class SecKillServiceImpl implements SecKillService {
     @Autowired
@@ -41,6 +45,8 @@ public class SecKillServiceImpl implements SecKillService {
     @Autowired
     RedissonClient redissonClient;
 
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 
 
     private final String SKU_STOCK_SEMAPHORE = "seckill:stock:";
@@ -124,6 +130,8 @@ public class SecKillServiceImpl implements SecKillService {
 
     @Override
     public String kill(String killId, String key, Integer num) {
+        long s1 = System.currentTimeMillis();
+
         MemberRespVo respVo = LoginUserInterceptor.loginUser.get();
 
         // 1. 获取秒杀商品的详细信息
@@ -154,16 +162,27 @@ public class SecKillServiceImpl implements SecKillService {
                         if(aBoolean) {
                             // 占位成功说明从来没买过
                             RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE + randomCode);
-                            try {
-                                boolean b = semaphore.tryAcquire(num, 100, TimeUnit.MILLISECONDS);
+                            boolean b = semaphore.tryAcquire(num);
 
+                            if(b) {
                                 // 秒杀成功， 快速下单, 发送mq消息
                                 String timeId = IdWorker.getTimeId();
-                                return timeId;
+                                SecKillOrderTo orderTo = new SecKillOrderTo();
+                                orderTo.setOrderSn(timeId);
+                                orderTo.setMemberId(respVo.getId());
+                                orderTo.setNum(num);
+                                orderTo.setPromotionSessionId(redisTo.getPromotionSessionId());
+                                orderTo.setSkuId(redisTo.getSkuId());
+                                orderTo.setSeckillPrice(redisTo.getSeckillPrice());
 
-                            } catch (InterruptedException e) {
-                                return null;
+                                rabbitTemplate.convertAndSend("order-event-exchange", "order.seckill.order", orderTo);
+
+                                long s2 = System.currentTimeMillis();
+                                log.info("耗时：", (s2 - s1));
+
+                                return timeId;
                             }
+                            return null;
                         } else {
                             // 说明已经买过了
                             return null;

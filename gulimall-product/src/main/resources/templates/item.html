@@ -657,12 +657,12 @@
 
 								</div>
 							</div>
-							<div class="box-btns-two" th:if="${#dates.createNow().getTime()>=item.secKillInfoVo.startTime  && #dates.createNow().getTime()<=item.secKillInfoVo.endTime}">
+							<div class="box-btns-two" th:if="${item.secKillInfoVo!=null && (#dates.createNow().getTime()>=item.secKillInfoVo.startTime  && #dates.createNow().getTime()<=item.secKillInfoVo.endTime)}">
 								<a href="#" id="secKillA" th:attr="skuId=${item.info.skuId},sesssionId=${item.secKillInfoVo.promotionSessionId},code=${item.secKillInfoVo.randomCode}">
 									立即抢购
 								</a>
 							</div>
-                            <div class="box-btns-two" th:if="${#dates.createNow().getTime()<item.secKillInfoVo.startTime  || #dates.createNow().getTime()>item.secKillInfoVo.endTime}">
+                            <div class="box-btns-two" th:if="${item.secKillInfoVo==null || (#dates.createNow().getTime()<item.secKillInfoVo.startTime  || #dates.createNow().getTime()>item.secKillInfoVo.endTime)}">
                                 <a href="#" id="addToCartA" th:attr="skuId=${item.info.skuId}">
                                     加入购物车
                                 </a>
